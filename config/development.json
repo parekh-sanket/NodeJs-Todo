@@ -1,0 +1,16 @@
+{
+    "server" : {
+        "port":  3003
+    },
+    "mongoDb" : {
+        "url" : "mongodb+srv://ghostofpatel:F4SarwM4wAdbWXGV@todo.mh136.mongodb.net/"
+    },
+    "secret" : {
+        "jwtSecret" : "TODOLIST",
+        "saltRounds" : 10
+    },
+    "email" : {
+        "emailUser" : "maddison97@ethereal.email",
+        "emailPass"  : "BmbvBSnhq3bfYutTSp"
+    }
+}

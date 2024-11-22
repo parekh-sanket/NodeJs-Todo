@@ -47,8 +47,3 @@ In a separate terminal, run the following command to start the development serve
 
     ```bash
     npm run start-dev-server
-
-
-
-
-    

@@ -31,7 +31,7 @@ Follow these steps to set up and run the project locally:
 
     ```bash
     {
-        "mongodb": {
+        "mongoDb": {
           "url": "your-mongodb-connection-string"
         }
    }

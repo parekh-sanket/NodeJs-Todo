@@ -3,6 +3,8 @@ import * as common from "../lib/common"
 import User from "../database/models/User.model"
 
 export async function isAuthenticated(req: Request, res: Response, next: NextFunction):Promise<void> {
+    
+    // find token in header
     let token: string | undefined = req.header("Authorization")
     if (!token) {
         res.status(401).json({error: "Access denied"})
@@ -10,13 +12,17 @@ export async function isAuthenticated(req: Request, res: Response, next: NextFun
     }
 
     try {
+        // get token string
         token = token.split(" ")[1]
+        
+        // decode token
         const userId = common.decodeJWT(token)?._id
         if(!userId){
             res.status(401).json({error: "Access denied"})
             return
         }
 
+        // find user
         let user = await User.findById(userId)
         if(!user) {
             res.status(404).json({error: "User Not Found"})

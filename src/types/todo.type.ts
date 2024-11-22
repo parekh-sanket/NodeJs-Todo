@@ -23,3 +23,5 @@ export type markedTaskResponse =
 export type unMarkedTaskResponse =
     | {error: {message: string; status: number}; data?: undefined}
     | {data: {message: string; }; error?: undefined}
+
+export type addTodoPayload = { title: string, description: string, dueDate:  NativeDate }

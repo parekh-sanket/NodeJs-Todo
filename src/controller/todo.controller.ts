@@ -1,11 +1,12 @@
 import {Request, Response} from "express" 
 import * as todoService from "../service/todo.service"
-import * as common from "../lib/common"
+import { addTodoPayload } from "../types/todo.type"
+import { user } from "../types/user.type"
 
 export async function addTodo(req: Request, res: Response):Promise<void> {
     try {
-        let { title, description, dueDate }: { title: string, description: string, dueDate:  NativeDate } = req.body
-        let user = req.user as { username: string, _id: string }
+        let { title, description, dueDate }: addTodoPayload = req.body
+        let user = req.user as user
 
         if(!title || !description || !dueDate) {
             res.status(412).json({error: "invalid data"})

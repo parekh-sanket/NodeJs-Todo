@@ -1,11 +1,14 @@
 import {Request, Response} from "express" 
 import * as userService from "../service/user.service"
 import * as common from "../lib/common"
+import { userLoginPayload, userRegistrationPayload } from '../types/user.type'
 
 export async function userRegistration(req: Request, res: Response):Promise<void> {
     try {
-        let { username, password }: { username: string, password: string } = req.body
+        // process on body data
+        let { username, password }:userRegistrationPayload  = req.body
 
+        // validate data
         if(!username || !password) {
             res.json({error: "invalid data"}).status(412)
         }
@@ -20,6 +23,7 @@ export async function userRegistration(req: Request, res: Response):Promise<void
             return
         }
         
+        // set jwt token in response header
         res.setHeader("Authorization", "Bearer " + common.encodeJWT({_id : data._id}))
         res.status(200).json(data)
         return
@@ -38,8 +42,10 @@ export async function userRegistration(req: Request, res: Response):Promise<void
 
 export async function userLogin(req: Request, res: Response):Promise<void> {
     try {
-        let { username, password }: { username: string, password: string } = req.body
+        // process body data
+        let { username, password }: userLoginPayload = req.body
 
+        // validate data
         if(!username || !password) {
             res.json({error: "invalid data"}).status(412)
         }
@@ -54,6 +60,7 @@ export async function userLogin(req: Request, res: Response):Promise<void> {
             return
         }
         
+        // set token in response header
         res.setHeader("Authorization", "Bearer " + common.encodeJWT({_id : data._id}))
         res.status(200).json(data)
         return
@@ -73,9 +80,11 @@ export async function userLogin(req: Request, res: Response):Promise<void> {
 export async function edituserDetail(req: Request, res: Response) {
     try {
 
+        // process on body data
         let user = req.user as { username: string, _id: string }
         let { email }  = req.body
 
+        // validate data
         if(!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
             res.status(412).json({error: "invalid data"})
             return
@@ -90,7 +99,7 @@ export async function edituserDetail(req: Request, res: Response) {
         return
         
     } catch (err) {
-        console.log("Error in controller -> user -> function {userLogin} >>> error: ", err)
+        console.log("Error in controller -> user -> function {edituserDetail} >>> error: ", err)
         if (err instanceof Error) {
             res.status(500).json({ error: err.message });
             return

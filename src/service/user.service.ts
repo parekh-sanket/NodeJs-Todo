@@ -1,13 +1,14 @@
-import exp from "constants";
 import User from "../database/models/User.model"
-import {userRegistrationResponse, userLoginResponse} from "../types/user.type"
+import {userRegistrationResponse, userLoginResponse, userLoginPayload, editUserServiceParams} from "../types/user.type"
 import bcrypt from "bcrypt"
 import config from "config"
+import { userRegistrationPayload } from "../types/user.type"
 
 
-export async function userRegistration({username, password}: {username: string; password: string}):Promise<userRegistrationResponse> {
-
+export async function userRegistration({username, password}: userRegistrationPayload):Promise<userRegistrationResponse> {
     try {
+
+        // cheack is user already exist or not
         let existUser = await User.findOne({username})
         if (existUser) {
             return {
@@ -18,8 +19,10 @@ export async function userRegistration({username, password}: {username: string; 
             }
         }
 
+        // encrypt user password
         let hashedPassword = await bcrypt.hash(password, config.get("secret.saltRounds"))
 
+        // create user
         let user = await User.create({
             username,
             password : hashedPassword
@@ -37,8 +40,9 @@ export async function userRegistration({username, password}: {username: string; 
     }
 }
 
-export async function userLogin({username, password}: {username: string; password: string}):Promise<userLoginResponse> {
+export async function userLogin({username, password}: userLoginPayload):Promise<userLoginResponse> {
     try {
+        // find user
         let existUser = await User.findOne({username})
         if (!existUser) {
             return {
@@ -49,6 +53,7 @@ export async function userLogin({username, password}: {username: string; passwor
             }
         }
 
+        // match passowrd
         const match = await bcrypt.compare(password, existUser.password);
         if(!match) {
             return {
@@ -74,8 +79,10 @@ export async function userLogin({username, password}: {username: string; passwor
 export async function edituserDetail({
     user,
     email
-} : { user : { username : String , _id : String } , email : String }) {
+} : editUserServiceParams) {
     try{
+
+        // update user in database
         await User.findByIdAndUpdate(user._id , {
             email
         })

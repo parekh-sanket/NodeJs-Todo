@@ -1,17 +1,20 @@
 import {Request, Response} from "express" 
 import * as todoService from "../service/todo.service"
-import { addTodoPayload } from "../types/todo.type"
+import { addTodoPayload, editTodoPayload, getTodoListPayload } from "../types/todo.type"
 import { user } from "../types/user.type"
 
 export async function addTodo(req: Request, res: Response):Promise<void> {
     try {
+        // process on body data
         let { title, description, dueDate }: addTodoPayload = req.body
         let user = req.user as user
 
+        // validate data
         if(!title || !description || !dueDate) {
             res.status(412).json({error: "invalid data"})
         }
 
+        // validate duedata
         if(new Date(dueDate) < new Date()) {
             res.status(412).json({error: "Due date should be greater than current date"})
             return
@@ -41,20 +44,23 @@ export async function addTodo(req: Request, res: Response):Promise<void> {
 
 export async function editTodo(req: Request, res: Response):Promise<void> {
     try {
-        let { title, description, dueDate, reminderTime }: { title: string | undefined | null , description: string | undefined | null, dueDate:  NativeDate | undefined | null, reminderTime : NativeDate | undefined | null } = req.body
-        let user = req.user as { username: string, _id: string }
+        let { title, description, dueDate, reminderTime }: editTodoPayload = req.body
+        let user = req.user as user
         let todoId = req.params.todoId
 
-        if(!title && !description && !dueDate) {
+        // validate data
+        if(!title && !description && !dueDate && !reminderTime) {
             res.status(412).json({error: "invalid data"})
             return
         }
 
+        // validate todoId
         if(!todoId){
             res.status(412).json({error: "invalid data"})
             return
         }
 
+        // validate duedate
         if(dueDate && new Date(dueDate) < new Date()) {
             res.status(412).json({error: "Due date should be greater than current date"})
             return
@@ -78,7 +84,7 @@ export async function editTodo(req: Request, res: Response):Promise<void> {
         return
         
     } catch (err) {
-        console.log("Error in controller -> user -> function {addTodo} >>> error: ", err)
+        console.log("Error in controller -> user -> function {editTodo} >>> error: ", err)
         if (err instanceof Error) {
             res.status(500).json({ error: err.message });
             return
@@ -91,9 +97,10 @@ export async function editTodo(req: Request, res: Response):Promise<void> {
 
 export async function deleteTodo(req: Request, res: Response):Promise<void> {
     try {
-        let user = req.user as { username: string, _id: string }
+        let user = req.user as user
         let todoId = req.params.todoId
 
+        // validat data
         if(!todoId){
             res.status(412).json({error: "invalid data"})
             return
@@ -113,7 +120,7 @@ export async function deleteTodo(req: Request, res: Response):Promise<void> {
         return
         
     } catch (err) {
-        console.log("Error in controller -> user -> function {addTodo} >>> error: ", err)
+        console.log("Error in controller -> user -> function {deleteTodo} >>> error: ", err)
         if (err instanceof Error) {
             res.status(500).json({ error: err.message });
             return
@@ -126,9 +133,10 @@ export async function deleteTodo(req: Request, res: Response):Promise<void> {
 
 export async function markedTask(req: Request, res: Response):Promise<void> {
     try {
-        let user = req.user as { username: string, _id: string }
+        let user = req.user as user
         let todoId = req.params.todoId
 
+        // validate todo id
         if(!todoId){
             res.status(412).json({error: "invalid data"})
             return
@@ -161,9 +169,10 @@ export async function markedTask(req: Request, res: Response):Promise<void> {
 
 export async function unMarkedTask(req: Request, res: Response):Promise<void> {
     try {
-        let user = req.user as { username: string, _id: string }
+        let user = req.user as user
         let todoId = req.params.todoId
 
+        // validate todoId
         if(!todoId){
             res.status(412).json({error: "invalid data"})
             return
@@ -196,9 +205,10 @@ export async function unMarkedTask(req: Request, res: Response):Promise<void> {
 
 export async function getTodoList(req: Request, res: Response):Promise<void> {
     try{
-        let {date, month, year} = req.query as {date: string | undefined , month : string | undefined , year : string | undefined}
-        let user = req.user as { username: string, _id: string }
+        let {date, month, year} = req.query as getTodoListPayload
+        let user = req.user as user
 
+        // validate data
         if((date && !parseInt(date)) || (year && !parseInt(year)) || (month && !parseInt(month))) {
             res.status(412).json({error: "invalid data"})
             return

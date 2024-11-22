@@ -3,7 +3,7 @@
         "port":  3003
     },
     "mongoDb" : {
-        "url" : "mongodb+srv://ghostofpatel:F4SarwM4wAdbWXGV@todo.mh136.mongodb.net/"
+        "url" : "url"
     },
     "secret" : {
         "jwtSecret" : "TODOLIST",

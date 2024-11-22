@@ -1,5 +1,5 @@
 import Todo from "../database/models/Todo.model"
-import {addTodoResponse, editTodoResponse, deleteTodoResponse, markedTaskResponse, unMarkedTaskResponse} from "../types/todo.type"
+import {addTodoResponse, editTodoResponse, deleteTodoResponse, markedTaskResponse, unMarkedTaskResponse, addTodoServiceParam, editTodoServiceParam, deleteTodoServiceParam, markedTaskServiceParam, unMarkedTaskServiceParam, getTodoListServiceParam} from "../types/todo.type"
 import cron from "node-cron";
 import * as common from  "../lib/common"
 
@@ -8,13 +8,9 @@ export async function addTodo({
     description,
     dueDate,
     user,
-}: {
-    title: string
-    description: string
-    dueDate: NativeDate
-    user: {username: string; _id: string}
-}): Promise<addTodoResponse> {
+}: addTodoServiceParam): Promise<addTodoResponse> {
     try {
+        // create todo
         let todo = await Todo.create({
             title,
             description,
@@ -22,6 +18,7 @@ export async function addTodo({
             userId: user._id,
         })
 
+        // prepare response 
         let response: addTodoResponse = {
             userId: todo.userId.toString(),
             title: todo.title,
@@ -46,15 +43,10 @@ export async function editTodo({
     user,
     todoId,
     reminderTime
-}: {
-    title: string | undefined | null
-    description: string | undefined | null
-    dueDate: NativeDate | undefined | null,
-    reminderTime: NativeDate | undefined | null,
-    user: {username: string; _id: string}
-    todoId: string
-}): Promise<editTodoResponse> {
+}: editTodoServiceParam): Promise<editTodoResponse> {
     try {
+
+        // find existing todo
         let todo = await Todo.findById(todoId)
         if (!todo) {
             return {
@@ -65,6 +57,7 @@ export async function editTodo({
             }
         }
 
+        // validate todo owner
         if (todo.userId.toString() !== user._id) {
             return {
                 error: {
@@ -74,8 +67,8 @@ export async function editTodo({
             }
         }
 
+        // if today is create current date then only you can edit todo
         let todayDate = new Date(new Date().setHours(0, 0, 0, 0))
-
         if(todo.createdAt && new Date(new Date(todo.createdAt).setHours(0, 0, 0, 0)) < todayDate) {
             return {
                 error: {
@@ -85,6 +78,7 @@ export async function editTodo({
             }
         }
         
+        // validate remiderTime
         if(reminderTime && todo.createdAt && new Date(reminderTime) < new Date(todo.createdAt)){
             return {
                 error: {
@@ -94,6 +88,7 @@ export async function editTodo({
             }
         }
 
+        // update todo
         await Todo.findByIdAndUpdate(todoId, {
             title,
             description,
@@ -115,11 +110,10 @@ export async function editTodo({
 export async function deleteTodo({
     user,
     todoId,
-}: {
-    user: {username: string; _id: string}
-    todoId: string
-}): Promise<deleteTodoResponse> {
+}: deleteTodoServiceParam): Promise<deleteTodoResponse> {
     try {
+
+        // check todo is exist or not
         let todo = await Todo.findById(todoId)
         if (!todo) {
             return {
@@ -128,8 +122,9 @@ export async function deleteTodo({
                     message: "todo not found",
                 },
             }
-        }
+        } 
 
+        // check ownership of todo
         if (todo.userId.toString() !== user._id) {
             return {
                 error: {
@@ -139,8 +134,8 @@ export async function deleteTodo({
             }
         }
 
+        // if todo created today then user can delete it
         let todayDate = new Date(new Date().setHours(0, 0, 0, 0))
-
         if(todo.dueDate && new Date(new Date(todo.createdAt).setHours(0, 0, 0, 0)) < todayDate) {
             return {
                 error: {
@@ -150,6 +145,7 @@ export async function deleteTodo({
             }
         }
 
+        // delete todo
         await Todo.findByIdAndDelete(todoId)
 
         return {
@@ -166,11 +162,10 @@ export async function deleteTodo({
 export async function markedTask({
     user,
     todoId,
-}: {
-    user: {username: string; _id: string}
-    todoId: string
-}): Promise<markedTaskResponse> {
+}: markedTaskServiceParam): Promise<markedTaskResponse> {
     try {
+
+        // find todo
         let todo = await Todo.findById(todoId)
         if (!todo) {
             return {
@@ -181,6 +176,7 @@ export async function markedTask({
             }
         }
 
+        // check ownership
         if (todo.userId.toString() !== user._id) {
             return {
                 error: {
@@ -190,6 +186,7 @@ export async function markedTask({
             }
         }
 
+        // check already completed or not
         if(todo.status === "completed") {
             return {
                 error : {
@@ -199,6 +196,7 @@ export async function markedTask({
             }
         }
 
+        // if not then complete task
         await Todo.findByIdAndUpdate(todoId,{
             status: "completed",
             completedAt : new Date()
@@ -218,11 +216,10 @@ export async function markedTask({
 export async function unMarkedTask({
     user,
     todoId,
-}: {
-    user: {username: string; _id: string}
-    todoId: string
-}): Promise<unMarkedTaskResponse> {
+}: unMarkedTaskServiceParam): Promise<unMarkedTaskResponse> {
     try {
+
+        // find todo
         let todo = await Todo.findById(todoId)
         if (!todo) {
             return {
@@ -233,6 +230,7 @@ export async function unMarkedTask({
             }
         }
 
+        // check ownership
         if (todo.userId.toString() !== user._id) {
             return {
                 error: {
@@ -242,6 +240,7 @@ export async function unMarkedTask({
             }
         }
 
+        // check todo status
         if(todo.status === "pending") {
             return {
                 error : {
@@ -251,6 +250,7 @@ export async function unMarkedTask({
             }
         }
 
+        // update todo
         await Todo.findByIdAndUpdate(todoId,{
             status: "pending",
             completedAt : null
@@ -272,19 +272,16 @@ export async function getTodoList({
     date,
     year,
     month
-}:{
-    user: {username: string; _id: string}
-    date: number,
-    year: number,
-    month : number
-}){
+}:getTodoListServiceParam){
     try{
+        // get given date
         let newFullDate = new Date()
         newFullDate.setDate(date)
         newFullDate.setHours(0, 0, 0, 0)
         newFullDate.setFullYear(year)
         newFullDate.setMonth(month - 1)
 
+        // apply query
         let todoList = await Todo.find({
             userId: user._id,
             createdAt: {
@@ -301,24 +298,28 @@ export async function getTodoList({
 }
 
 
-cron.schedule("*/1 * * * *", async () => { // Runs every 5 minutes
+cron.schedule("*/1 * * * *", async () => { // Runs every 1 minutes
     try {
         const now = new Date();
         
+        // find all todo which hase remider time diffrent in between 1 minute
         const upcomingTodos = await Todo.find({
             reminderTime: { $gte: now , $lte : new Date(now.setMinutes(now.getMinutes() + 1))}, // Reminder time is due
         }).populate("userId", "username email") as any;
         
+        // send email to all upcomming todos
         for (const todo of upcomingTodos) {
             if(todo.userId){
                 const user = todo.userId
 
+                // create email payload
                 if(user?.email){
                     const emailText = `
                         Reminder: Your task "${todo.title}" is due on ${todo.dueDate}.
                         Description: ${todo.description}.
                     `;
                     
+                    // send email
                     await common.sendEmail({
                         subject : "Todo Reminder",
                         text : emailText,

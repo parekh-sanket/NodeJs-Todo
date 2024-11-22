@@ -37,6 +37,7 @@ export async function sendEmail({
 	subject: string,
 	text: string
 }): Promise<void> {
+	// initialize nodemailer
     const transporter = nodemailer.createTransport({
         host: 'smtp.ethereal.email',
     	port: 587,
@@ -46,6 +47,7 @@ export async function sendEmail({
         },
     });
 
+	// send email
     await transporter.sendMail({
         from: config.get("email.emailUser"),
         to,

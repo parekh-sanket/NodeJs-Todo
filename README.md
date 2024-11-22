@@ -27,13 +27,17 @@ Follow these steps to set up and run the project locally:
     npm install
 
 3. **Configure MongoDB**  
-   Update the MongoDB connection URL in config/development.json. Replace the existing value with your MongoDB URL:
+   Update the MongoDB connection URL in config/development.json. Replace the existing value with your MongoDB URL and also email user and password:
 
     ```bash
     {
         "mongoDb": {
           "url": "your-mongodb-connection-string"
-        }
+        },
+        "email" : {
+           "emailUser" : "email user", // for this visit https://ethereal.email/ and create temporary email ans password
+           "emailPass"  : "password"
+       }
    }
 
 4. **Build the Project**  

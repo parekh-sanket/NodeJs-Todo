@@ -20,13 +20,13 @@ Follow these steps to set up and run the project locally:
    git clone https://github.com/parekh-sanket/NodeJs-Todo.git
    cd NodeJs-Todo
 
-2. **Install Dependencies**
+2. **Install Dependencies**   
    Install the required npm packages:
 
     ```bash
     npm install
 
-3. **Configure MongoDB**
+3. **Configure MongoDB**  
    Update the MongoDB connection URL in config/development.json. Replace the existing value with your MongoDB URL:
 
     ```bash
@@ -36,13 +36,13 @@ Follow these steps to set up and run the project locally:
         }
    }
 
-4. **Build the Project**
+4. **Build the Project**  
    Open a terminal and run the following command:
 
     ```bash
     npm run build
 
-5. **Start the Development Server**
+5. **Start the Development Server**  
    In a separate terminal, run the following command to start the development server:
 
     ```bash

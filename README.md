@@ -21,13 +21,13 @@ Follow these steps to set up and run the project locally:
    cd NodeJs-Todo
 
 2. **Install Dependencies**
-Install the required npm packages:
+   Install the required npm packages:
 
     ```bash
     npm install
 
 3. **Configure MongoDB**
-Update the MongoDB connection URL in config/development.json. Replace the existing value with your MongoDB URL:
+   Update the MongoDB connection URL in config/development.json. Replace the existing value with your MongoDB URL:
 
     ```bash
     {
@@ -37,13 +37,13 @@ Update the MongoDB connection URL in config/development.json. Replace the existi
    }
 
 4. **Build the Project**
-Open a terminal and run the following command:
+   Open a terminal and run the following command:
 
     ```bash
     npm run build
 
 5. **Start the Development Server**
-In a separate terminal, run the following command to start the development server:
+   In a separate terminal, run the following command to start the development server:
 
     ```bash
     npm run start-dev-server
